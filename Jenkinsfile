@@ -4,7 +4,7 @@ pipeline {
          stage ('Build') {
           steps {
              sh '''cd $WORKSPACE
-                   docker build -t devops-react:v${BUILD_NUMBER} .'''
+                   docker build -t react:v${BUILD_NUMBER} .'''
              }
            }
            stage('docker login ') {
@@ -17,7 +17,7 @@ pipeline {
 
         stage('docker tagging ') {
             steps {
-                sh 'docker tag frontend:v${BUILD_NUMBER} vineethmathangi95/threetier:reactjs-v${BUILD_NUMBER}'
+                sh 'docker tag react:v${BUILD_NUMBER} vineethmathangi95/threetier:reactjs-v${BUILD_NUMBER}'
             }
         }
 
