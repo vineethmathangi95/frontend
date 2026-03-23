@@ -1,27 +1,13 @@
 pipeline {
-    agent any
-    options { 
-       buildDiscarder(logRotator(numToKeepStr: '10')) 
-       timestamps()
-    }
-    
-
-    stages {
-       
-        stage('npm  build ') {
-            steps {
-               sh 'npm run build'
-               
-            }
-        }
-        
-        stage('docker image build ') {
-            steps {
-                sh 'docker build -t frontend:v${BUILD_NUMBER} .'
-            }
-        }
-
-        stage('docker login ') {
+      agent any
+      stages {
+         stage ('Build') {
+          steps {
+             sh '''cd $WORKSPACE
+                   docker build -t devops-react:v${BUILD_NUMBER} .'''
+             }
+           }
+           stage('docker login ') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
@@ -40,17 +26,5 @@ pipeline {
                 sh 'docker push vineethmathangi95/threetier:reactjs-v${BUILD_NUMBER}'
             }
         }
-
-        /*
-        stage('push ECR'){
-            steps {
-                sh '''aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 897276212041.dkr.ecr.us-west-2.amazonaws.com
-                       
-                       docker tag java-spring-19:v${BUILD_NUMBER} 897276212041.dkr.ecr.us-west-2.amazonaws.com/devops19-java:v${BUILD_NUMBER}
-                       docker push 897276212041.dkr.ecr.us-west-2.amazonaws.com/devops19-java:v${BUILD_NUMBER}
-                '''
-            }
+          }
         }
-        */
-    }
-}
